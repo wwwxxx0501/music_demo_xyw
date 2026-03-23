@@ -441,7 +441,8 @@ def add_platform_song(platform_song_id):
 
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    debug_mode = os.environ.get("FLASK_DEBUG", "0") == "1"
+    app.run(debug=debug_mode, host="0.0.0.0", port=5000)
 else:
     # When imported (e.g., for testing), still init the DB
     init_db()
