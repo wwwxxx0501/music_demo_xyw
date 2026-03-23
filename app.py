@@ -6,7 +6,7 @@ import time
 import math
 import random
 
-from flask import Flask, request, jsonify, send_from_directory, abort
+from flask import Flask, request, jsonify, send_from_directory, abort, send_file
 
 from database import init_db, get_db, row_to_dict
 
@@ -263,7 +263,7 @@ def upload():
     meta = extract_metadata(tmp_path, ext)
 
     title = meta["title"] or os.path.splitext(original_name)[0]
-    artist = meta["artist"] or "Unknown Artist"
+    artist = meta["artist"] or "未知艺术家"
 
     # Rename to stable name
     safe_name = f"{file_hash}{ext}"
@@ -342,6 +342,24 @@ def get_waveform(song_id):
     with open(waveform_file) as f:
         data = json.load(f)
     return jsonify(data)
+
+
+@app.route("/api/stream/<int:song_id>")
+def stream_audio(song_id):
+    db = get_db()
+    asset = db.execute(
+        "SELECT a.file_path, a.file_name FROM audio_assets a "
+        "JOIN songs s ON s.id = a.song_id "
+        "WHERE a.song_id=? AND s.source='local'",
+        (song_id,),
+    ).fetchone()
+    db.close()
+    if asset is None:
+        return jsonify({"error": "Audio file not found"}), 404
+    file_path = asset["file_path"]
+    if not os.path.isfile(file_path):
+        return jsonify({"error": "File missing on disk"}), 404
+    return send_file(file_path, conditional=True)
 
 
 @app.route("/api/library/<int:song_id>", methods=["DELETE"])

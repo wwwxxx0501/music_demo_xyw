@@ -300,11 +300,13 @@ async function openSongModal(songId) {
     document.getElementById('modal-overlay').classList.remove('hidden');
 
     if (song.source === 'local') {
-      // Try to load the audio – the file path is on the server, we can't stream it
-      // directly unless we add a /stream endpoint. For the demo we just show metadata + waveform.
-      document.getElementById('play-pause-btn').disabled = true;
+      // Stream the audio from the server
+      audio.src = `/api/stream/${songId}`;
+      audio.load();
+      document.getElementById('play-pause-btn').disabled = false;
       document.getElementById('player-note').classList.add('hidden');
     } else {
+      audio.src = '';
       document.getElementById('play-pause-btn').disabled = true;
       document.getElementById('player-note').classList.remove('hidden');
     }
@@ -427,7 +429,7 @@ function drawWaveform(canvas, points) {
     const barH = amp * midY;
     const x = i * barW;
 
-    // Gradient colour based on amplitude
+    // Gradient color based on amplitude
     const alpha = 0.5 + amp * 0.5;
     ctx.fillStyle = `rgba(124, 92, 252, ${alpha.toFixed(2)})`;
     ctx.fillRect(x, midY - barH, Math.max(barW - 0.5, 0.5), barH * 2);
