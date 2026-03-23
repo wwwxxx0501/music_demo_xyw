@@ -125,7 +125,6 @@ def _generate_waveform_real(path: str) -> list:
         # Fall back to pydub
         from pydub import AudioSegment
         seg = AudioSegment.from_file(path)
-        import numpy as np
         samples = np.array(seg.get_array_of_samples(), dtype="float32")
         if seg.channels == 2:
             samples = samples.reshape(-1, 2).mean(axis=1)
@@ -260,13 +259,6 @@ def upload():
         os.unlink(tmp_path)
         db.close()
         return jsonify({"duplicate": True, "song": row_to_dict(existing)}), 409
-
-    # Update status to parsing
-    db.execute(
-        "UPDATE songs SET status='parsing' WHERE id IN "
-        "(SELECT song_id FROM audio_assets WHERE file_path=?)",
-        (tmp_path,),
-    )
 
     meta = extract_metadata(tmp_path, ext)
 

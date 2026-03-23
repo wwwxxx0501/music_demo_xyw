@@ -442,14 +442,17 @@ document.getElementById('waveform-canvas').addEventListener('click', e => {
   updateSeekBar(ratio);
 });
 
-document.getElementById('seek-bar-bg') && document.querySelector('.seek-bar-bg').addEventListener('click', e => {
-  const rect = e.currentTarget.getBoundingClientRect();
-  const ratio = (e.clientX - rect.left) / rect.width;
-  updateSeekBar(ratio);
-  if (!audio.paused && audio.duration) {
-    audio.currentTime = ratio * audio.duration;
-  }
-});
+const seekBarBg = document.getElementById('seek-bar-bg') || document.querySelector('.seek-bar-bg');
+if (seekBarBg) {
+  seekBarBg.addEventListener('click', e => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    updateSeekBar(ratio);
+    if (!audio.paused && audio.duration) {
+      audio.currentTime = ratio * audio.duration;
+    }
+  });
+}
 
 function updateSeekBar(ratio) {
   document.getElementById('seek-bar-fill').style.width = `${(ratio * 100).toFixed(1)}%`;
