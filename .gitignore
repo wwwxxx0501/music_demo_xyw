@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+music_library.db
+uploads/
+waveforms/
+*.egg-info/
+.env
