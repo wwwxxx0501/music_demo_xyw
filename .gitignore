@@ -1,0 +1,5 @@
+uploads/
+waveforms/
+*.pyc
+__pycache__/
+*.db
